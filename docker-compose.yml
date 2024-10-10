@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  sungrow:
+    build: .
+    container_name: SG-0x01
+    volumes:
+      - /home/SunGrow/config0x01.yaml:/config/config.yaml
+      - /home/SunGrow/logs:/logs
+    ports:
+      - 8080:8080
+    environment:
+      - TZ=Asia/Karachi
+    restart: always
+    networks:
+      - SunGrow_network
+
+networks:
+  SunGrow_network:
+    driver: "bridge"
