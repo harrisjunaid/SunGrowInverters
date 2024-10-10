@@ -70,7 +70,7 @@ exports:
     mqtt:
     device: # Device Information
       identifiers: "{{ serial_number }}"
-      name: "SunGrow Inverter {{ serial_number }}"
+      # name: "SunGrow Inverter {{ serial_number }}"   # Read from mqtt.py line 96
     # unique_id must be unique for each sensor but identifiers must be the same for all sensors part of the same device 
     ha_sensors:
       - name: "Daily Generation"
