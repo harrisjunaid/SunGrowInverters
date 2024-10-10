@@ -58,7 +58,7 @@ def main():
             runonce = True
 
     logging.info(f'Starting SunGather {__version__}')
-    logging.info(f'Need Help? https://github.com/bohdan-s/SunGather')
+    logging.info(f'Need Help? https://github.com/harrisjunaid/SunGrowInverters')
     logging.info(f'NEW HomeAssistant Add-on: https://github.com/bohdan-s/hassio-repository')
 
     try:
