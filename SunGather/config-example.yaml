@@ -62,7 +62,7 @@ exports:
     enabled: True                          # [Optional] Default is False
     host: 192.168.1.200                     # [Required] IP or Hostname of MQTT Server 
     port: 1883                            # [Optional] Default 1883
-    # topic: "SunGrow/{serial_number}"    # [Optional] Default: "SunGrow/{serial_number}"
+    topic: "SunGrow/{serial_number}"    # [Optional] Default: "SunGrow/{serial_number}"
     username: "mqtt-sungrow"                             # [Optional] Username is MQTT server requires it
     password: "1122qqww"                             # [Optional] Password is MQTT server requires it
     # client_id:                            # [Optional] Client id for mqtt connection. Defaults to Serial Number.
