@@ -5,16 +5,16 @@ services:
     build: .
     container_name: SG-0x01
     volumes:
-      - /home/sunGrow/config-0x01.yaml:/config/config.yaml
-      - /home/sunGrow/logs:/logs
+      - /home/sungrow/config-0x01.yaml:/config/config.yaml
+      - /home/sungrow/logs:/logs
     ports:
       - "8081:8081"
     environment:
       - TZ=Asia/Karachi
     restart: always
     networks:
-      - sunGrow_network
+      - sungrow_network
 
 networks:
-  sunGrow_network:
+  sungrow_network:
     driver: "bridge"
