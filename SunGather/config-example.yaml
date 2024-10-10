@@ -70,6 +70,7 @@ exports:
     mqtt:
     device: # Device Information
       identifiers: "{{ serial_number }}"
+      name: "SunGrow Inverter {{ serial_number }}"
     # unique_id must be unique for each sensor but identifiers must be the same for all sensors part of the same device 
     ha_sensors:
       - name: "Daily Generation"
@@ -80,9 +81,6 @@ exports:
         icon: "mdi:solar-power"
         value_template: "{{ value_json.daily_power_yields | round(2) }}"
         unique_id: "daily_power_yields_{{ serial_number }}"
-        device: # Nested device information
-          identifiers: "{{ serial_number }}"
-          name: "Daily Generation"
           
       - name: "Daily Export to Grid"
         sensor_type: sensor
@@ -93,9 +91,6 @@ exports:
         value_template: "{{ value_json.daily_export_to_grid | round(2) }}"
         last_reset_value_template: "{{ value_json.last_reset }}"
         unique_id: "daily_export_to_grid_{{ serial_number }}"
-        device: # Nested device information
-          identifiers: "{{ serial_number }}"
-          name: "Daily Export to Grid"
           
       - name: "Daily Import from Grid"
         sensor_type: sensor
@@ -106,10 +101,7 @@ exports:
         value_template: "{{ value_json.daily_import_from_grid | round(2) }}"
         last_reset_value_template: "{{ value_json.last_reset }}"
         unique_id: "daily_import_from_grid_{{ serial_number }}"
-        device: # Nested device information
-          identifiers: "{{ serial_number }}"
-          name: "Daily Import from Grid"
-          
+        
       - name: "Temperature"
         sensor_type: sensor
         register: internal_temperature
@@ -118,9 +110,6 @@ exports:
         icon: "mdi:thermometer"
         value_template: "{{ value_json.internal_temperature | round(2) }}"
         unique_id: "internal_temperature_{{ serial_number }}"
-        device: # Nested device information
-          identifiers: "{{ serial_number }}"
-          name: "Temperature"
           
       - name: "Power State"
         sensor_type: binary_sensor
@@ -129,9 +118,6 @@ exports:
         payload_on: "ON"
         payload_off: "OFF"
         unique_id: "run_state_{{ serial_number }}"
-        device: # Nested device information
-          identifiers: "{{ serial_number }}"
-          name: "Power State"
           
       - name: "Active Generation"
         sensor_type: sensor
@@ -139,9 +125,6 @@ exports:
         device_class: power
         state_class: measurement
         unique_id: "total_active_power_{{ serial_number }}"
-        device: # Nested device information
-          identifiers: "{{ serial_number }}"
-          name: "Active Generation"
           
       - name: "Active Export to Grid"
         sensor_type: sensor
@@ -149,22 +132,14 @@ exports:
         device_class: power
         state_class: measurement
         unique_id: "export_to_grid_{{ serial_number }}"
-        device: # Nested device information
-          identifiers: "{{ serial_number }}"
-          name: "Active Export to Grid"
-          
-          sw_version: "{{ software_version }}"
+
       - name: "Active Import from Grid"
         sensor_type: sensor
         register: import_from_grid
         device_class: power
         state_class: measurement
         unique_id: "import_from_grid_{{ serial_number }}"
-        device: # Nested device information
-          identifiers: "{{ serial_number }}"
-          name: "Active Import from Grid"
-          
-
+        
 
   # Publish Registers to PVOutput
   - name: pvoutput      
