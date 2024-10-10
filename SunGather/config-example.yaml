@@ -1,19 +1,19 @@
 inverter:
-  host: 192.168.1.100                       # [Required] IP Address of the Inverter or Dongle
-  # port: 502                               # [Optional] Default for modbus is 502, for http is 8082
+  host: 192.168.1.5                       # [Required] IP Address of the Inverter or Dongle
+  port: 502                               # [Optional] Default for modbus is 502, for http is 8082
   # timeout: 10                             # [Optional] Default is 10, how long to wait for a connection
   # retries: 3                              # [Optional] Default is 3, how many times to retry if connection fails
-  # slave: 0x01                             # [Optional] Default is 0x01
+  slave: 0x01                             # [Optional] Default is 0x01
   # scan_interval: 30                       # [Optional] Default is 30
   connection: modbus                        # [Required] options: modbus, sungrow, http
-  # model: "SG7.0RT"                        # [Optional] This is autodetected on startup, only needed if detection issues or for testing
-                                            # See model list here: https://github.com/harrisjunaid/SunGrowInverters#supported
+  model: "SG250HX"                        # [Optional] This is autodetected on startup, only needed if detection issues or for testing
+                                            # See model list here: https://github.com/harrisjunaid/SunGrow#supported
   # serial: xxxxxxxxxx                      # [Optional] This is autodetected on startup, only needed if detection issues or for testing, used as a unique ID
   # smart_meter: True                       # [Optional] Default is False, Set to true if inverter supports reading grind / house consumption
   # use_local_time: False                   # [Optional] Default False, Uses Inventer time, if true it uses PC time when updating timestamps (e.g. PVOutput)
-  # log_console: INFO                       # [Optional] Default is WARNING, Options: DEBUG, INFO, WARNING, ERROR
-  # log_file: DEBUG                         # [Optional] Default is OFF, Options: OFF, DEBUG, INFO, WARNING, ERROR
-  # level: 1                                # [Optional] Set the amount of information to gather
+  log_console: INFO                       # [Optional] Default is WARNING, Options: DEBUG, INFO, WARNING, ERROR
+  #log_file: DEBUG                         # [Optional] Default is OFF, Options: OFF, DEBUG, INFO, WARNING, ERROR
+  level: 3                                # [Optional] Set the amount of information to gather
                                             # 0 = Model and Solar Generation, 
                                             # 1 (default) = Useful data, all required for exports, 
                                             # 2 everything your Inverter supports, 
@@ -27,10 +27,10 @@ exports:
     enabled: True                          # [Optional] Default is False
 
   # Runs a simple Webserver showing Config and last read registers
-  # Access at http://localhost:8080 or http://[serverip]:8080
+  # Access at http://localhost:8081 or http://[serverip]:8081
   - name: webserver 
     enabled: True                           # [Optional] Default is False
-    # port: 8080                            # [Optional] Default is 8080
+    port: 8081                            # [Optional] Default is 8081
 
   # Output data to InfluxDB
   - name: influxdb
@@ -40,7 +40,7 @@ exports:
     # username:                             # [Optional] Username if not using token
     # password:                             # [Optional] Password if not using token
     org: "Default"                          # [Required] InfluxDB Organization (for influxdb v1.8x this will be ignored)
-    bucket: "SunGather"                     # [Required] InfluxDB Bucket (for influxdb v1.8x this is the database name)
+    bucket: "SunGrow"                     # [Required] InfluxDB Bucket (for influxdb v1.8x this is the database name)
     measurements:                           # [Required] Registers to publish to bucket
       - point: "power"
         register: daily_power_yields
@@ -59,14 +59,18 @@ exports:
 
   # Publish Registers to MQTT / Home Assistant
   - name: mqtt
-    enabled: False                          # [Optional] Default is False
+    enabled: True                          # [Optional] Default is False
     host: 192.168.1.200                     # [Required] IP or Hostname of MQTT Server 
-    # port: 1883                            # [Optional] Default 1883
-    # topic: "SunGather/{serial_number}"    # [Optional] Default: "SunGather/{serial_number}"
-    # username:                             # [Optional] Username is MQTT server requires it
-    # password:                             # [Optional] Password is MQTT server requires it
+    port: 1883                            # [Optional] Default 1883
+    # topic: "SunGrow/{serial_number}"    # [Optional] Default: "SunGrow/{serial_number}"
+    username: "mqtt-sungrow"                             # [Optional] Username is MQTT server requires it
+    password: "1122qqww"                             # [Optional] Password is MQTT server requires it
     # client_id:                            # [Optional] Client id for mqtt connection. Defaults to Serial Number.
     homeassistant: True
+    mqtt:
+    device: # Device Information
+      identifiers: "{{ serial_number }}"
+      model: "{{ model }}"
     ha_sensors:
       - name: "Daily Generation"
         sensor_type: sensor
@@ -74,6 +78,12 @@ exports:
         device_class: energy
         state_class: total_increasing
         icon: "mdi:solar-power"
+        value_template: "{{ value_json.daily_power_yields | round(2) }}"
+        unique_id: "daily_power_yields_{{ serial_number }}"
+        device: # Nested device information
+          identifiers: "{{ serial_number }}"
+          name: "Daily Generation"
+          
       - name: "Daily Export to Grid"
         sensor_type: sensor
         register: daily_export_to_grid
@@ -82,6 +92,11 @@ exports:
         icon: "mdi:transmission-tower-export"
         value_template: "{{ value_json.daily_export_to_grid | round(2) }}"
         last_reset_value_template: "{{ value_json.last_reset }}"
+        unique_id: "daily_export_to_grid_{{ serial_number }}"
+        device: # Nested device information
+          identifiers: "{{ serial_number }}"
+          name: "Daily Export to Grid"
+          
       - name: "Daily Import from Grid"
         sensor_type: sensor
         register: daily_import_from_grid
@@ -90,39 +105,73 @@ exports:
         icon: "mdi:transmission-tower-import"
         value_template: "{{ value_json.daily_import_from_grid | round(2) }}"
         last_reset_value_template: "{{ value_json.last_reset }}"
+        unique_id: "daily_import_from_grid_{{ serial_number }}"
+        device: # Nested device information
+          identifiers: "{{ serial_number }}"
+          name: "Daily Import from Grid"
+          
       - name: "Temperature"
         sensor_type: sensor
         register: internal_temperature
         device_class: temperature
         state_class: measurement
+        icon: "mdi:thermometer"
+        value_template: "{{ value_json.internal_temperature | round(2) }}"
+        unique_id: "internal_temperature_{{ serial_number }}"
+        device: # Nested device information
+          identifiers: "{{ serial_number }}"
+          name: "Temperature"
+          
       - name: "Power State"
         sensor_type: binary_sensor
         register: run_state
         device_class: running
         payload_on: "ON"
         payload_off: "OFF"
+        unique_id: "run_state_{{ serial_number }}"
+        device: # Nested device information
+          identifiers: "{{ serial_number }}"
+          name: "Power State"
+          
       - name: "Active Generation"
         sensor_type: sensor
         register: total_active_power
-        dev_class: power
+        device_class: power
         state_class: measurement
+        unique_id: "total_active_power_{{ serial_number }}"
+        device: # Nested device information
+          identifiers: "{{ serial_number }}"
+          name: "Active Generation"
+          
       - name: "Active Export to Grid"
         sensor_type: sensor
         register: export_to_grid
-        dev_class: power
+        device_class: power
         state_class: measurement
+        unique_id: "export_to_grid_{{ serial_number }}"
+        device: # Nested device information
+          identifiers: "{{ serial_number }}"
+          name: "Active Export to Grid"
+          
+          sw_version: "{{ software_version }}"
       - name: "Active Import from Grid"
         sensor_type: sensor
         register: import_from_grid
-        dev_class: power
+        device_class: power
         state_class: measurement
+        unique_id: "import_from_grid_{{ serial_number }}"
+        device: # Nested device information
+          identifiers: "{{ serial_number }}"
+          name: "Active Import from Grid"
+          
+
 
   # Publish Registers to PVOutput
   - name: pvoutput      
     enabled: False                          # [Optional] Default is False
     api: "xxxxx"                            # [Required] API Key, Settings > API Key
     sid: "xxxxx"                            # [Optional] System ID, Settings > Registered Systems > System ID
-    # join_team: False                      # [Optional] Default True, This will join the SunGather team in PVOutput, Setting to False will leave the team if previously joined
+    # join_team: False                      # [Optional] Default True, This will join the SunGrow team in PVOutput, Setting to False will leave the team if previously joined
     rate_limit: 60                          # [Optional] Default 60, 60 for regular accounts, 300 for donation accounts
     cumulative_flag: 2                      # If using v2 & v4 set to 1, of using only v1 set to 2 (if daily totals)
     batch_points: 1                         # [Optional] Default 1, how many data points to batch upload, 

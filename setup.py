@@ -8,8 +8,8 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name="SunGather",
     version=__version__,
-    author="Bohdan Flower",
-    author_email="github@bohdan.net",
+    author="xxx",
+    author_email="xxx",
     description="Collect data from Sungrow Inverters and feed to various locations (MQTT, PVOutput, Home Assistant)",
     long_description=long_description,
     long_description_content_type="text/markdown",

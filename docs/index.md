@@ -88,7 +88,7 @@ docker run options:
 -v {path to}/config.yaml:/config/config.yaml  <- Set Config File Location  
 -v {logpath}:/logs                            <- Set Log folder Location if using log to file (also set log_file in config.yaml)  
 -e TZ=Australia/Sydney                        <- Set Timezone  
--p 8080:8080                                  <- Set Web server port (only if using the webserver export)  
+-p 8081:8081                                  <- Set Web server port (only if using the webserver export)  
 
 ```sh
 docker pull bohdans/sungather
@@ -97,7 +97,7 @@ docker run -d --name sungather \
   -v {path to}/config.yaml:/config/config.yaml \
   -v {logpath}:/logs \
   -e TZ=Australia/Sydney \
-  -p 8080:8080 \
+  -p 8081:8081 \
   bohdans/sungather
 ```
 Note: replace Australia/Sydney with relevant timezone
@@ -131,7 +131,7 @@ python3 sungather.py -c /full/path/config.yaml
 A collection of exports are available:
 
 * console:    Output information to console, useful for troubleshooting
-* webserver:  Output to a simple website, default http://localhost:8080 or http://\<serverip\>:8080
+* webserver:  Output to a simple website, default http://localhost:8081 or http://\<serverip\>:8081
 * mqtt:       Output to a pre-existing MQTT server, needed for Home Assistant integration
 * pvoutput:   Output to PVOutput.org, requires account and solar is set up on website first. 
 * InfluxDB:   Output directly to InfluxDB, can then be used by Grafana, etc..
